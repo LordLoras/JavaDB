@@ -19,6 +19,7 @@ import javax.swing.JScrollPane;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 
@@ -28,7 +29,8 @@ public class Frame {
 
 	private JFrame frame;
 	JTable table;
-	JComboBox comboBox = new JComboBox();	
+	JComboBox comboBox = new JComboBox();
+	JComboBox searchBox = new JComboBox();
 	DBManager manager = new DBManager();
 	private JScrollPane scrollPane;
 	private JTextField searchTextbox;
@@ -172,20 +174,69 @@ public class Frame {
 		JButton searchBtn = new JButton("Search");
 		searchBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				table.setModel(manager.DrawEmployeeTable());
-				switch(searchTextbox.getText())
+				
+				//if the search box is not empty do search
+				if(!searchTextbox.getText().isEmpty())
 				{
-				case "Employee Name":
-					
+				switch(searchBox.getSelectedItem().toString())
+				{
+				case "Employee Name":						
+					table.setModel(manager.SearchField("employee_table", "employee_name", searchTextbox.getText()));
+					manager.HideID(table);
+					break;
+				case "Employee Salary":
+					table.setModel(manager.SearchField("employee_table", "employee_salary", searchTextbox.getText()));
+					manager.HideID(table);
+					break;
+				case "Employee Phone":
+					table.setModel(manager.SearchField("employee_table", "employee_phone", searchTextbox.getText()));
+					manager.HideID(table);
+					break;
+				case "Product Name":
+					table.setModel(manager.SearchField("products_table", "product_name", searchTextbox.getText()));
+					manager.HideID(table);
+					break;
+				case "Product Price":
+					table.setModel(manager.SearchField("products_table", "product_price", searchTextbox.getText()));
+					manager.HideID(table);
+					break;
+				case "Product Rating":
+					table.setModel(manager.SearchField("products_table", "product_rating", searchTextbox.getText()));
+					manager.HideID(table);
+					break;
+				case "Pet Name":
+					table.setModel(manager.SearchField("pets_table", "pet_name", searchTextbox.getText()));
+					manager.HideID(table);
+					break;
+				case "Pet Species":
+					table.setModel(manager.SearchField("pets_table", "pet_species", searchTextbox.getText()));
+					manager.HideID(table);
+					break;
+				case "Pet Breed":
+					table.setModel(manager.SearchField("pets_table", "pet_breed", searchTextbox.getText()));
+					manager.HideID(table);
+					break;
+				case "Pet Age":
+					table.setModel(manager.SearchField("pets_table", "pet_age", searchTextbox.getText()));
+					manager.HideID(table);
+					break;
 				
 				}
+				
+				}
+				//if the search box is empty alert the user
+				else
+				{
+					JOptionPane.showMessageDialog(null, "Your search request cannot be empty", "ERROR", JOptionPane.ERROR_MESSAGE);
+				}
+				
 			}
 		});
 		searchBtn.setBounds(10, 176, 89, 23);
 		frame.getContentPane().add(searchBtn);
 		
-		JComboBox searchBox = new JComboBox();
-		searchBox.setModel(new DefaultComboBoxModel(new String[] {"Employee Name", "Employee Salary", "Employee Phone", "Product Name", "Product Price", "Product Rating"}));
+		
+		searchBox.setModel(new DefaultComboBoxModel(new String[] {"Employee Name", "Employee Salary", "Employee Phone", "Product Name", "Product Price", "Product Rating", "Pet Name", "Pet Species ", "Pet Breed", "Pet Age"}));
 		searchBox.setBounds(10, 114, 168, 20);
 		frame.getContentPane().add(searchBox);
 		
