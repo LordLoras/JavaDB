@@ -3,6 +3,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+
 
 public class DBManager {
 	
@@ -27,7 +30,7 @@ public class DBManager {
     	try 
     	{
     	    prop.load(new FileInputStream("config.properties"));
-    	    System.out.println(prop.getProperty("host"));
+    	    //System.out.println(prop.getProperty("host"));
     	} catch (IOException e) 
     	{
     	    e.printStackTrace();
@@ -122,5 +125,88 @@ public class DBManager {
 		}
     	return rset;
     }
-
+    
+   //hide the ID column from the user
+    public void HideID(JTable table)
+    {
+    	
+		table.getColumnModel().getColumn(0).setWidth(0);
+		table.getColumnModel().getColumn(0).setMinWidth(0);
+		table.getColumnModel().getColumn(0).setMaxWidth(0); 
+    	
+    }
+    //Draw the employee table to the JTable
+    public DefaultTableModel DrawEmployeeTable()
+    {
+    	
+    	//set table headers for employees
+    	DefaultTableModel model = new DefaultTableModel(new String[]{"id","Employee Name", "Employee Salary", "Employee Phone Number"}, 0);
+		ResultSet rs = ExecuteQuery("SELECT * FROM employee_table");
+		try {
+			//fetch all results from employee_table and add them to the table
+			while(rs.next())
+			{
+				int id = rs.getInt("id");
+			    String a = rs.getString("employee_name");
+			    int b = rs.getInt("employee_salary");
+			    int c = rs.getInt("employee_phone");
+			    model.addRow(new Object[]{id, a, b, c});
+			    
+			}
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+		}
+		return model;	
+    }
+    
+    
+    //Draw Products Table
+    public DefaultTableModel DrawProductsTable()
+    {
+    	
+    	//set table headers for employees
+    	DefaultTableModel model = new DefaultTableModel(new String[]{"id","Product Name", "Product Price", "Product Rating"}, 0);
+		ResultSet rs = ExecuteQuery("SELECT * FROM products_table");
+		try {
+			//fetch all results from employee_table and add them to the table
+			while(rs.next())
+			{
+				int id = rs.getInt("id");
+			    String a = rs.getString("product_name");
+			    int b = rs.getInt("product_price");
+			    int c = rs.getInt("product_rating");
+			    model.addRow(new Object[]{id, a, b, c});
+			    
+			}
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+		}
+		return model;	
+    }
+    
+    //Draw Pets Table
+    
+    public DefaultTableModel DrawPetsTable()
+    {
+    	
+    	//set table headers for employees
+    	DefaultTableModel model = new DefaultTableModel(new String[]{"id","Pet Name", "Pet Species", "Pet Breed", "Pet Age"}, 0);
+		ResultSet rs = ExecuteQuery("SELECT * FROM pets_table");
+		try {
+			//fetch all results from employee_table and add them to the table
+			while(rs.next())
+			{
+				int id = rs.getInt("id");
+			    String a = rs.getString("pet_name");
+			    String b = rs.getString("pet_species");
+			    String c = rs.getString("pet_breed");
+			    int d = rs.getInt("pet_age");
+			    model.addRow(new Object[]{id, a, b, c,d});
+			    
+			}
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+		}
+		return model;	
+    }
 }

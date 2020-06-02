@@ -18,6 +18,8 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JScrollPane;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
 
 
 
@@ -25,10 +27,11 @@ import javax.swing.event.ChangeEvent;
 public class Frame {
 
 	private JFrame frame;
-	private JTable table;
+	JTable table;
 	JComboBox comboBox = new JComboBox();	
 	DBManager manager = new DBManager();
 	private JScrollPane scrollPane;
+	private JTextField searchTextbox;
 
 	/**
 	 * Launch the application.
@@ -51,6 +54,9 @@ public class Frame {
 	 */
 	public Frame() {
 		initialize();
+		//upon initialization draw employee table as default
+		table.setModel(manager.DrawEmployeeTable());
+		manager.HideID(table);
 	}
 
 	/**
@@ -58,49 +64,43 @@ public class Frame {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 910, 672);
+		frame.setBounds(100, 100, 1212, 672);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
 		JButton btnDelete = new JButton("DELETE");
-		btnDelete.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-			//get the id of currently selected item and delete the currently selected row based on the ID and table		
-			int id = 0;
-			//if the user selected row set id to the rows ID
-			if(table.getSelectedRow() != -1)
-			{
-				id = Integer.parseInt(table.getModel().getValueAt(table.getSelectedRow(), 0).toString());
-			}
-			
-			//check if a row has been selected and delete the entry from the database depending on combobox selection on button click
-			if(comboBox.getSelectedItem() == "Products" && table.getSelectedRow() != -1)
-			{
-			System.out.println("selected");
-			//manager.ExecuteUpdate("DELETE FROM products_table WHERE id=\"" + id + "\"");			
-			}
-			if(comboBox.getSelectedItem() == "Employees" && table.getSelectedRow() != -1)
-			{
-				manager.ExecuteUpdate("DELETE FROM employee_table WHERE id=\"" + id + "\"");			
-			}								
-			if(comboBox.getSelectedItem() == "Pets" && table.getSelectedRow() != -1)	
-			{
-				manager.ExecuteUpdate("DELETE FROM pets_table WHERE id=\"" + id + "\"");	
-			}
-			
-
-		   
-		}});
+		
 		btnDelete.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e) {				
+					//get the id of currently selected item and delete the currently selected row based on the ID and table		
+					int id = 0;
+					//if the user selected row set id to the rows ID
+					if(table.getSelectedRow() != -1)
+					{
+						id = Integer.parseInt(table.getModel().getValueAt(table.getSelectedRow(), 0).toString());
+					}
+					
+					//check if a row has been selected and delete the entry from the database depending on combobox selection on button click
+					if(comboBox.getSelectedItem() == "Products" && table.getSelectedRow() != -1)
+					{
+					System.out.println("selected");
+					//manager.ExecuteUpdate("DELETE FROM products_table WHERE id=\"" + id + "\"");			
+					}
+					if(comboBox.getSelectedItem() == "Employees" && table.getSelectedRow() != -1)
+					{
+						manager.ExecuteUpdate("DELETE FROM employee_table WHERE id=\"" + id + "\"");			
+					}								
+					if(comboBox.getSelectedItem() == "Pets" && table.getSelectedRow() != -1)	
+					{
+						manager.ExecuteUpdate("DELETE FROM pets_table WHERE id=\"" + id + "\"");	
+					}
 			}
 		});
 		btnDelete.setBounds(10, 11, 89, 23);
 		frame.getContentPane().add(btnDelete);		
 		
 		scrollPane = new JScrollPane();
-		scrollPane.setBounds(109, 15, 762, 607);
+		scrollPane.setBounds(401, 14, 762, 607);
 		frame.getContentPane().add(scrollPane);
 		table = new JTable();
 		scrollPane.setViewportView(table);
@@ -144,57 +144,22 @@ public class Frame {
 				//triggers on selecting employees
 				if(e.getStateChange() == ItemEvent.SELECTED && comboBox.getSelectedItem() == "Employees") 
 				{                  
-					//set table headers for employees
-                    DefaultTableModel model = new DefaultTableModel(new String[]{"id","Employee Name", "Employee Salary", "Employee Phone Number"}, 0);
-    				ResultSet rs = manager.ExecuteQuery("SELECT * FROM employee_table");
-    				try {
-    					//fetch all results from employee_table and add them to the table
-    					while(rs.next())
-    					{
-    						int id = rs.getInt("id");
-    					    String a = rs.getString("employee_name");
-    					    int b = rs.getInt("employee_salary");
-    					    int c = rs.getInt("employee_phone");
-    					    model.addRow(new Object[]{id, a, b, c});
-    					}
-    				} catch (SQLException ex) {
-    					ex.printStackTrace();
-    				}
-    				table.setModel(model);
-    				//hide the ID column from the user
-    				table.getColumnModel().getColumn(0).setWidth(0);
-    				table.getColumnModel().getColumn(0).setMinWidth(0);
-    				table.getColumnModel().getColumn(0).setMaxWidth(0); 
-                    
+					table.setModel(manager.DrawEmployeeTable());
+    				manager.HideID(table);
                 }
 				
 				//triggers on selecting products
 				if(e.getStateChange() == ItemEvent.SELECTED && comboBox.getSelectedItem() == "Products") 
 				{
-					DefaultTableModel model = new DefaultTableModel(new String[]{"id","Product Name", "Product Price", "Product Rating"}, 0);
-    				ResultSet rs = manager.ExecuteQuery("SELECT * FROM products_table");
-    				try {
-    					//fetch all results from products_table and add them to the table
-    					while(rs.next())
-    					{
-    						int id = rs.getInt("id");
-    					    String a = rs.getString("product_name");
-    					    int b = rs.getInt("product_price");
-    					    int c = rs.getInt("product_rating");
-    					    model.addRow(new Object[]{id,a, b, c});
-    					}
-    				}
-    				catch (SQLException ex) 
-    				{
-    					// TODO Auto-generated catch block
-    					ex.printStackTrace();
-    				}
-    				table.setModel(model);
-    				//hide the ID column from the user
-    				table.getColumnModel().getColumn(0).setWidth(0);
-    				table.getColumnModel().getColumn(0).setMinWidth(0);
-    				table.getColumnModel().getColumn(0).setMaxWidth(0); 
-    				table.setModel(model);
+    				table.setModel(manager.DrawProductsTable());
+    				manager.HideID(table);
+				}
+				
+				//triggers on selecting pets
+				if(e.getStateChange() == ItemEvent.SELECTED && comboBox.getSelectedItem() == "Pets") 
+				{
+    				table.setModel(manager.DrawPetsTable());
+    				manager.HideID(table);
 				}
 				
 				
@@ -203,5 +168,34 @@ public class Frame {
 		comboBox.setModel(new DefaultComboBoxModel(new String[] {"Employees", "Products", "Pets"}));
 		comboBox.setBounds(10, 45, 89, 20);
 		frame.getContentPane().add(comboBox);
+		
+		JButton searchBtn = new JButton("Search");
+		searchBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				table.setModel(manager.DrawEmployeeTable());
+				switch(searchTextbox.getText())
+				{
+				case "Employee Name":
+					
+				
+				}
+			}
+		});
+		searchBtn.setBounds(10, 176, 89, 23);
+		frame.getContentPane().add(searchBtn);
+		
+		JComboBox searchBox = new JComboBox();
+		searchBox.setModel(new DefaultComboBoxModel(new String[] {"Employee Name", "Employee Salary", "Employee Phone", "Product Name", "Product Price", "Product Rating"}));
+		searchBox.setBounds(10, 114, 168, 20);
+		frame.getContentPane().add(searchBox);
+		
+		JLabel lblNewLabel = new JLabel("Search by");
+		lblNewLabel.setBounds(10, 93, 68, 14);
+		frame.getContentPane().add(lblNewLabel);
+		
+		searchTextbox = new JTextField();
+		searchTextbox.setBounds(10, 145, 165, 20);
+		frame.getContentPane().add(searchTextbox);
+		searchTextbox.setColumns(10);
 	}
 }
